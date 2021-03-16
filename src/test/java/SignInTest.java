@@ -4,6 +4,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -19,6 +21,7 @@ public class SignInTest {
     private final String baseURL = "https://github.com/";
 
     public WebDriver webDriver;
+    public WebDriverWait webDriverWait;
 
     public Properties getPropertyValue() {
         Properties prop = new Properties();
@@ -42,6 +45,7 @@ public class SignInTest {
         System.setProperty(getPropertyValue().getProperty("driver"), getPropertyValue().getProperty("linkDriver"));
         webDriver = new ChromeDriver();
         webDriver.manage().window().maximize();
+        webDriverWait = new WebDriverWait(webDriver, 20);
     }
 
     @AfterMethod
@@ -60,17 +64,22 @@ public class SignInTest {
     @Test
     public void testSignInPage() {
         webDriver.get(baseURL);
+        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Sign in")));
         webDriver.findElement(By.linkText("Sign in")).click();
 
+        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='login']")));
         WebElement username = webDriver.findElement(By.xpath("//input[@name='login']"));
         username.sendKeys(getPropertyValue().getProperty("username"));
 
+        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='password']")));
         WebElement password = webDriver.findElement(By.xpath("//input[@name='password']"));
         password.sendKeys(getPropertyValue().getProperty("password"));
 
+        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='commit']")));
         WebElement signInButton = webDriver.findElement(By.xpath("//input[@name='commit']"));
         signInButton.click();
 
+        webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("/html/body")));
         String expectedTitle = "GitHub";
         Assert.assertEquals(expectedTitle, webDriver.getTitle());
         Assert.assertEquals(baseURL, webDriver.getCurrentUrl());
