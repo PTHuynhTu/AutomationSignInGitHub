@@ -59,7 +59,7 @@ public class SignInExplicitWait {
             this.setUsername(strUsername);
             webDriverWait.until(ExpectedConditions.visibilityOf(password));
             this.setPassword(strPassword);
-            webDriverWait.until(ExpectedConditions.visibilityOf(signInButton));
+            webDriverWait.until(ExpectedConditions.elementToBeClickable(signInButton));
             this.clickSignInButton();
         } catch (TimeoutException exception) {
             logger.error("Throw TimeoutException", exception);

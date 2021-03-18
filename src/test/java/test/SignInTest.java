@@ -53,6 +53,7 @@ public class SignInTest {
 
     @AfterMethod
     public void closeDrive() {
+        webDriver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
         webDriver.quit();
     }
 
