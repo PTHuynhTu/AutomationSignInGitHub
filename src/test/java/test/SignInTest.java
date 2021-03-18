@@ -1,19 +1,20 @@
+package test;
 
 import org.apache.log4j.Logger;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import pageFactory.SignInExplicitWait;
+import pageFactory.SignInImplicitWait;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 public class SignInTest {
 
@@ -22,6 +23,8 @@ public class SignInTest {
 
     public WebDriver webDriver;
     public WebDriverWait webDriverWait;
+    public SignInExplicitWait signInExplicitWait;
+    public SignInImplicitWait signInImplicitWait;
 
     public Properties getPropertyValue() {
         Properties prop = new Properties();
@@ -45,41 +48,34 @@ public class SignInTest {
         System.setProperty(getPropertyValue().getProperty("driver"), getPropertyValue().getProperty("linkDriver"));
         webDriver = new ChromeDriver();
         webDriver.manage().window().maximize();
-        webDriverWait = new WebDriverWait(webDriver, 20);
+        webDriverWait = new WebDriverWait(webDriver, 10);
     }
 
     @AfterMethod
     public void closeDrive() {
+        webDriver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
         webDriver.quit();
     }
 
-    @Test
-    public void testGetHomePage() {
+    @Test(priority = 0)
+    public void testSignInPage_ExplicitWait() {
         webDriver.get(baseURL);
-        String expectedTitle = "GitHub: Where the world builds software · GitHub";
+        signInExplicitWait = new SignInExplicitWait(webDriver, webDriverWait);
+        signInExplicitWait.clickSignInLink();
+        signInExplicitWait.signInGitHub(getPropertyValue().getProperty("username"), getPropertyValue().getProperty("password"));
+        String expectedTitle = "GitHub";
         Assert.assertEquals(expectedTitle, webDriver.getTitle());
         Assert.assertEquals(baseURL, webDriver.getCurrentUrl());
+
     }
 
-    @Test
-    public void testSignInPage() {
+    @Test(priority = 1)
+    public void testSignInPage_ImplicitWait() {
+        webDriver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         webDriver.get(baseURL);
-        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Sign in")));
-        webDriver.findElement(By.linkText("Sign in")).click();
-
-        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='login']")));
-        WebElement username = webDriver.findElement(By.xpath("//input[@name='login']"));
-        username.sendKeys(getPropertyValue().getProperty("username"));
-
-        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='password']")));
-        WebElement password = webDriver.findElement(By.xpath("//input[@name='password']"));
-        password.sendKeys(getPropertyValue().getProperty("password"));
-
-        webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@name='commit']")));
-        WebElement signInButton = webDriver.findElement(By.xpath("//input[@name='commit']"));
-        signInButton.click();
-
-        webDriverWait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("/html/body")));
+        signInImplicitWait = new SignInImplicitWait(webDriver);
+        signInImplicitWait.clickSignInLink();
+        signInImplicitWait.signInGitHub(getPropertyValue().getProperty("username"), getPropertyValue().getProperty("password"));
         String expectedTitle = "GitHub";
         Assert.assertEquals(expectedTitle, webDriver.getTitle());
         Assert.assertEquals(baseURL, webDriver.getCurrentUrl());
