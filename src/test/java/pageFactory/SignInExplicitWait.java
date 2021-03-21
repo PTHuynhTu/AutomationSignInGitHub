@@ -1,4 +1,4 @@
-package pageFactory;
+package test.java.pageFactory;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.TimeoutException;
@@ -12,29 +12,29 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 public class SignInExplicitWait {
     Logger logger = Logger.getLogger(SignInExplicitWait.class);
     public WebDriver webDriver;
-    public WebDriverWait webDriverWait;
+    public WebDriverWait webDriverWait10;
 
     @FindBy(linkText = "Sign in")
     WebElement signInLink;
 
-    @FindBy(xpath = "//input[@name='login']")
+    @FindBy(css = "input[id='login_field']")
     WebElement username;
 
-    @FindBy(xpath = "//input[@name='password']")
+    @FindBy(css = "input[id='password']")
     WebElement password;
 
-    @FindBy(xpath = "//input[@name='commit']")
+    @FindBy(css = "input[type='submit']")
     WebElement signInButton;
 
-    public SignInExplicitWait(WebDriver webDriver, WebDriverWait webDriverWait) {
+    public SignInExplicitWait(WebDriver webDriver) {
         this.webDriver = webDriver;
-        this.webDriverWait = webDriverWait;
+        this.webDriverWait10 = new WebDriverWait(webDriver, 10);
         PageFactory.initElements(webDriver, this);
     }
 
     public void clickSignInLink() {
         try {
-            webDriverWait.until(ExpectedConditions.visibilityOf(signInLink));
+            webDriverWait10.until(ExpectedConditions.elementToBeClickable(signInLink));
             signInLink.click();
         } catch (TimeoutException exception) {
             logger.error("Throw TimeoutException", exception);
@@ -55,11 +55,11 @@ public class SignInExplicitWait {
 
     public void signInGitHub(String strUsername, String strPassword) {
         try {
-            webDriverWait.until(ExpectedConditions.visibilityOf(username));
+            webDriverWait10.until(ExpectedConditions.visibilityOf(username));
             this.setUsername(strUsername);
-            webDriverWait.until(ExpectedConditions.visibilityOf(password));
+            webDriverWait10.until(ExpectedConditions.visibilityOf(password));
             this.setPassword(strPassword);
-            webDriverWait.until(ExpectedConditions.elementToBeClickable(signInButton));
+            webDriverWait10.until(ExpectedConditions.elementToBeClickable(signInButton));
             this.clickSignInButton();
         } catch (TimeoutException exception) {
             logger.error("Throw TimeoutException", exception);
